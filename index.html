@@ -1,0 +1,125 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Delim</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+</head>
+<body>
+
+
+<h1 class="text-danger text-center">Apply delimeters</h1>
+<div class="container">
+
+ <div class="form-group">
+  <label for="comment">Add data</label>
+  <textarea class="form-control" rows="10" id="textBoxData"></textarea>
+</div> 
+
+	<button type="button" class="btn btn-danger" id="singleInverted">Single Inverted</button>
+  
+    <button type="button" class="btn btn-danger" id="doubleInverted">Double Inverted</button>
+
+     <button type="button" class="btn btn-danger" id="comma">Comma</button>
+
+     <button type="button" class="btn btn-danger" id="tilt">Tilt</button>
+
+     <button type="button" class="btn btn-danger" id="duplicate">Remove duplicates</button>
+
+     <button type="button" class="btn btn-warning" id="team"><a href="team.html" style="text-decoration: none;color: white">Team</a></button>
+
+   <div class="form-group mt-3">
+  <label for="comment">Result: <h5 id="count"></h5></label>
+  <textarea class="form-control" rows="10" id="result"></textarea>
+   </div> 
+
+
+</div>
+<script src="js/jquery.js"></script>
+
+
+
+<script>
+
+
+$(document).on('click','#comma',function(){
+     textBoxData = $('#textBoxData').val()
+     textBoxData = textBoxData.replace(/\s+/g, ',');
+     $('#result').html(textBoxData) 
+})
+
+
+
+$(document).on('click','#singleInverted',function(){
+     textBoxData = $('#textBoxData').val()
+     textBoxData = textBoxData.replace(/\s+/g, ',');
+     textArray = textBoxData.split(',')
+
+       textStr=''
+       $.each(textArray, function( index, value ) {
+            textStr += "'"+value+"',"
+        });
+       strIndex=textStr.lastIndexOf(',')
+       newStr=textStr.substr(0, strIndex)  
+       $('#result').html(newStr) 
+})
+
+
+$(document).on('click','#doubleInverted',function(){
+     textBoxData = $('#textBoxData').val()
+     textBoxData = textBoxData.replace(/\s+/g, ',');
+     textArray = textBoxData.split(',')
+     
+       textStr=''
+       $.each(textArray, function( index, value ) {
+            textStr += '"'+value+'",'
+        });
+       strIndex=textStr.lastIndexOf(',')
+       newStr=textStr.substr(0, strIndex)  
+       $('#result').html(newStr) 
+})
+
+
+$(document).on('click','#tilt',function(){
+     textBoxData = $('#textBoxData').val()
+     textBoxData = textBoxData.replace(/\s+/g, ',');
+     textArray = textBoxData.split(',')
+     
+       textStr=''
+       $.each(textArray, function( index, value ) {
+            textStr += '`'+value+'`,'
+        });
+       strIndex=textStr.lastIndexOf(',')
+       newStr=textStr.substr(0, strIndex)  
+       $('#result').html(newStr) 
+})
+
+
+$(document).on('click','#duplicate',function(){
+     textBoxData = $('#textBoxData').val()
+     textBoxData = textBoxData.replace(/\s+/g, ',');
+     textArray = textBoxData.split(',')
+     newTextArray = []
+
+       let emailObject = {}
+        $.each(textArray, function( index, value ) {
+            emailObject[value] = value
+        });
+
+        $.each(emailObject, function( key, value ) {
+             newTextArray.push(value)
+        });
+
+        let newTextString = newTextArray.toString()
+        let finalStr = newTextString.replace(/,+/g, "\n");
+        $('#result').html(finalStr) 
+
+})
+
+
+</script>
+
+
+</body>
+</html>

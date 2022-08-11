@@ -1,0 +1,187 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Delim</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+</head>
+<body>
+
+
+<h1 class="text-danger text-center">Teams</h1>
+
+<div class="container">
+
+<button type="button" class="btn btn-primary" id="osl_query">OSL query</button>
+<button type="button" class="btn btn-primary" id="lvc_query">LVC query</button>
+
+<!--  --------------------  OSL --------------------->
+
+<div id="osl_data_container" style="display: none">
+    <div class="row mt-3">
+     <div class="col-sm-3">
+     <button type="button" class="btn btn-success" id="osl_result">Result</button> 
+   </div>
+
+    <div class="col-sm-3">
+     <input class="form-control" id="osl_gid" placeholder="Enter Gid">
+   </div>
+
+   <div class="col-sm-6">	
+    <div class="form-group">
+     <input class="form-control" id="osl_date" placeholder="Enter date" value="2022-09-30">
+   </div>
+</div>
+   </div>
+
+     <div class="form-group">
+       <label for="comment">Add data for OSL</label>
+       <textarea class="form-control" rows="10" id="osl_data"></textarea>
+     </div> 
+
+   
+        <div class="form-group mt-3">
+            <label for="comment">Result: <h5 id="osl_count"></h5></label>
+            <textarea class="form-control" rows="10" id="osl_result_data"></textarea>
+        </div> 
+   
+</div>
+
+
+<!-- ------------------------ LVC -------------------- -->
+
+<div id="lvc_data_container" style="display: none">
+    <div class="row mt-3">
+     <div class="col-sm-3">
+     <button type="button" class="btn btn-success" id="lvc_result">Result</button> 
+   </div>
+
+    <div class="col-sm-3">
+     <input class="form-control" id="lvc_gid" placeholder="Enter Gid">
+   </div>
+
+  <!--  <div class="col-sm-6">	
+    <div class="form-group">
+     <input class="form-control" id="lvc_date" placeholder="Enter date" value="2022-09-30">
+   </div>
+</div> -->
+   </div>
+
+     <div class="form-group">
+       <label for="comment">Add data for LVC</label>
+       <textarea class="form-control" rows="10" id="lvc_data"></textarea>
+     </div> 
+
+     
+        <div class="form-group mt-3">
+            <label for="comment">Result: <h5 id="lvc_count"></h5></label>
+            <textarea class="form-control" rows="10" id="lvc_result_data"></textarea>
+        </div> 
+     
+</div>
+ 
+
+</div>
+
+
+
+
+
+
+
+<script src="js/jquery.js"></script>
+
+<script>
+
+$(document).on('click','#osl_query',function(){
+    $("#osl_data_container").css('display','block')
+     $("#lvc_data_container").css('display','none')
+})
+
+
+$(document).on('click','#lvc_query',function(){
+    $("#lvc_data_container").css('display','block')
+    $("#osl_data_container").css('display','none')
+})
+
+
+$(document).on('click','#osl_result',function(){
+
+          osl_date = $('#osl_date').val()
+          gid = $('#osl_gid').val()
+          osl_data = $('#osl_data').val()
+
+          osl_data = osl_data.replace(/\s+/g, ',');
+          textArray = osl_data.split(',')
+
+          newTextArray = []
+          let emailObject = {}
+          $.each(textArray, function( index, value ) {
+              emailObject[value] = value
+          });
+
+           $.each(emailObject, function( key, value ) {
+               newTextArray.push(value)
+          });
+
+
+           textStr=''
+           $.each(newTextArray, function( index, value ) {
+                textStr += "'"+value+"',"
+            });
+           strIndex=textStr.lastIndexOf(',')
+           newStr=textStr.substr(0, strIndex)  
+       
+
+            osl_date = "'"+osl_date+"'";
+            queryString = `SELECT cv.group_id AS gid,u.mail AS emailid,token_elearning_id AS elearningid,FROM_UNIXTIME(cv.expired_on),DATEDIFF(${osl_date},FROM_UNIXTIME(cv.expired_on)) AS NoOfDays FROM cloud6.cloud6_learner_token_list_view as cv inner join
+             cloud6.users as u on u.uid=cv.uid WHERE cv.learner_email IN (${newStr})
+             AND cv.token_status = 1
+             AND cv.group_id = ${gid} order by u.mail;`;
+             $('#osl_result_data').html(queryString) 
+})
+
+
+
+$(document).on('click','#lvc_result',function(){
+  
+          gid = $('#lvc_gid').val()
+
+         lvc_data = $('#lvc_data').val()
+         lvc_data = lvc_data.replace(/\s+/g, ',');
+         textArray = lvc_data.split(',')
+
+
+          newTextArray = []
+          let emailObject = {}
+          $.each(textArray, function( index, value ) {
+              emailObject[value] = value
+          });
+
+           $.each(emailObject, function( key, value ) {
+               newTextArray.push(value)
+          });
+
+
+
+       textStr=''
+       $.each(newTextArray, function( index, value ) {
+            textStr += "'"+value+"',"
+        });
+       strIndex=textStr.lastIndexOf(',')
+       newStr=textStr.substr(0, strIndex)  
+
+           queryString = `SELECT cv.group_id AS gid,u.mail AS emailid,cv.token_elearning_id AS elearningid FROM 
+             cloud6.cloud6_learner_token_list_view as cv 
+             inner join cloud6.users as u on u.uid=cv.uid 
+             WHERE cv.learner_email IN (${newStr}) AND cv.token_status = 1 AND cv.group_id = ${gid} AND cv.product_type_id <> 1 order by u.mail;`;
+
+             $('#lvc_result_data').html(queryString) 
+})
+
+</script>
+
+
+</body>
+</html>
